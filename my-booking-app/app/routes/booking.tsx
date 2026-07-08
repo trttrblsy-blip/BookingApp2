@@ -1,9 +1,8 @@
 import {data,Route} from 'react-router'
-import { PrismaClient } from "../../prisma/client";
 import { PrismaPlanetScale } from "@prisma/adapter-planetscale";
 import { fetch as undiciFetch } from "undici"; // Only for Node.js <18
 
-const adapter = new PrismaPlanetScale({
+/*const adapter = new PrismaPlanetScale({
   url: process.env.DATABASE_URL,
   fetch: undiciFetch,
 });
@@ -19,4 +18,4 @@ export async function loader({ params }: Route.LoaderArgs) {
   if (!booking) throw data(null, { status: 404 });
 
   return booking;
-}
+}*/
