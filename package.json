@@ -1,0 +1,24 @@
+{
+  "name": "bookingapp2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trttrblsy-blip/BookingApp2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/trttrblsy-blip/BookingApp2/issues"
+  },
+  "homepage": "https://github.com/trttrblsy-blip/BookingApp2#readme",
+  "description": "",
+  "dependencies": {
+    "@prisma/adapter-planetscale": "^7.8.0",
+    "react-router-dom": "^7.18.1",
+    "undici": "^7.28.0"
+  }
+}

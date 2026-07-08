@@ -1,0 +1,56 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "./generated/prisma"
+  previewFeatures = ["shardKeys"]
+}
+
+
+datasource db {
+  provider = "mysql"
+}
+
+model Booking {
+  id         Int      @id @default(autoincrement())
+  roomId     Int
+  custumerId Int
+  workerId   Int
+  startDate  DateTime
+  endDate  DateTime
+  person     Person   @relation(fields: [custumerId], references: [id], map: "Booking_custumerId_fkey")
+  worker     Worker   @relation(fields: [workerId], references: [personId], map: "Booking_workerId_fkey")
+  room       Room     @relation(fields: [roomId], references: [id], map: "Booking_roomId_fkey")
+
+  @@index([custumerId], map: "Booking_custumerId_fkey")
+  @@index([roomId], map: "Booking_roomId_fkey")
+}
+
+model Person {
+  id       Int       @id
+  fullName String
+  birthDay DateTime
+  booking  Booking[]
+  worker   Worker?
+}
+
+model Room {
+  id       Int       @id @default(autoincrement())
+  capacity Int
+  type     String
+  booking  Booking[]
+}
+
+model Worker {
+  personId Int         @unique
+  role     worker_role @default(WORKER)
+  nickName String      @unique(map: "Worker_nickName_key")
+  password String      @unique(map: "Worker_password_key")
+  person   Person      @relation(fields: [personId], references: [id])
+  bookings Booking[]
+
+  @@index([personId], map: "Worker_personId_fkey")
+}
+
+enum worker_role {
+  WORKER
+  ADMIN
+}
