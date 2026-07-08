@@ -77,7 +77,7 @@ export default function Login() {
                 id="nickname"
                 {...register("nickname", { required: "nickname is required" })}
               />
-              {errors.email && (
+              {.email && (
                 <span className="form-error">{errors.email.message}</span>
               )}
             </div>
