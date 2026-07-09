@@ -1,12 +1,11 @@
-import type { Route } from "./+types/booking";
-import { Form, redirect, type ActionFunctionArgs } from "react-router";
+import { Form, redirect, useActionData, type ActionFunctionArgs } from "react-router";
+import { AuthContext, useAuth, type AuthContextType } from "../context/AuthContext";
 import { PrismaClient } from "../../generated/prisma/client";
 import { PrismaPlanetScale } from "@prisma/adapter-planetscale";
-import { fetch as undiciFetch } from "undici"; 
-import type { Worker } from "~/utils/Worker";
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { fetch as undiciFetch } from "undici"; // Only for Node.js <18
+import type { Worker } from "../utils/Worker";
+import type { Route } from "./+types/login";
+import Swal from "sweetalert2";
 
 const adapter = new PrismaPlanetScale({
   url: process.env.DATABASE_URL,
@@ -15,104 +14,67 @@ const adapter = new PrismaPlanetScale({
 const prisma = new PrismaClient({ adapter });
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: "New React Router App" }, { name: "description", content: "Welcome to React Router!" }];
+  return [{ title: "BookingApp" }, { name: "description", content: "Welcome to BookingApp!" }];
+}
+async function login(nickName: string, password: string,authContext:AuthContextType) {
+
+
+  const worker: Worker = (await prisma.worker.findFirst({
+    where: { AND: { nickName: nickName, password: password } },
+  })) as Worker;
+
+  if (!worker) {
+    console.log(worker);
+
+    throw new Error("Invalid nickname or password");
+  }
+
+  authContext?.setWorker(worker);
+
+  return worker;
 }
 
-
-
-export async function action({ request }: ActionFunctionArgs) {
-    const authContextType = useAuth();
+export async function action({ context ,request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const nickName = formData.get("nickname") as string;
   const password = formData.get("password") as string;
 
-  if(!nickName||!password){
-    return{error:"Nickname and Password are required"}
-  }
-    const result = await authContextType!.login(nickName, password);
-
-    if (result!.success){
-      return redirect("/booking")
+  try {
+    if (!nickName || !password) {
+      throw new Error("Nickname and Password are required");
     }
-    else
-  
+    await login(nickName, password,context.get(AuthContext));
+
+    return redirect("/booking");
+  } catch (error) {
+    return { error: (error as Error).message };
+  }
 }
 export default function Login() {
-  
+  const actionData = useActionData<typeof action>();
+
+
   return (
-    <div>
-      <h1>Welcome to Booking App</h1>
-      <h2>please Login</h2>
-      <Form method="post">
-        <div>
-          <label>Nickname:</label>
-          <textarea name="nickname" required></textarea>
+    <div className="max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-4">Please log in</h2>
+      <Form className="space-y-4 bg-white p-4 rounded shadow" method="post">
+        <div className="form-group">
+          <label className="block text-gray-700" htmlFor="nickname">
+            Nickname
+          </label>
+          <input className="border border-gray-300 rounded px-3 py-2 w-full" type="text" name="nickname" />
         </div>
-        <div>
-          <label>Password:</label>
-          <textarea name="password" required></textarea>
+        <div className="form-group">
+          <label className="block text-gray-700" htmlFor="password">
+            Password
+          </label>
+          <input className="border border-gray-300 rounded px-3 py-2 w-full" type="password" name="password" />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+          Login
+        </button>
+        {actionData?.error && <div className=" text-red-800 p-2 mb-4 rounded"> {actionData.error} </div>}
       </Form>
-    </div>
-  );
-}
-
-
-  return (
-    <div className="page">
-      <div className="container">
-        <div className="auth-container">
-          <h1 className="page-title">
-          </h1>
-          <Form className="auth-form" >
-            {error && <div className="error-message">{error}</div>}
-            <div className="form-group">
-              <label className="form-label" htmlFor="nickname">
-                Nickname
-              </label>
-              <input
-                className="form-input"
-                type="nickname"
-                id="nickname"
-                {...register("nickname", { required: "nickname is required" })}
-              />
-              {.email && (
-                <span className="form-error">{errors.email.message}</span>
-              )}
-            </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="password">
-                Password
-              </label>
-              <input
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
-                  },
-                  maxLength: {
-                    value: 12,
-                    message: "Password must be less than 12 characters",
-                  },
-                })}
-                className="form-input"
-                type="password"
-                id="password"
-              />
-              {errors.password && (
-                <span className="form-error">{errors.password.message}</span>
-              )}
-            </div>
-
-            <button type="submit" className="btn btn-primary btn-large">
-            Login
-            </button>
-          </Form>
-
-        </div>
-      </div>
     </div>
   );
 }
