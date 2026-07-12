@@ -1,40 +1,14 @@
 import { Form, redirect, useActionData, type ActionFunctionArgs } from "react-router";
-import { AuthContext, useAuth, type AuthContextType } from "../context/AuthContext";
-import { PrismaClient } from "../../generated/prisma/client";
-import { PrismaPlanetScale } from "@prisma/adapter-planetscale";
-import { fetch as undiciFetch } from "undici"; // Only for Node.js <18
 import type { Worker } from "../utils/Worker";
 import type { Route } from "./+types/login";
-import Swal from "sweetalert2";
-
-const adapter = new PrismaPlanetScale({
-  url: process.env.DATABASE_URL,
-  fetch: undiciFetch,
-});
-const prisma = new PrismaClient({ adapter });
+import { createSession } from "~/services/session.server";
+import { prisma } from "../../lib/prisma";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "BookingApp" }, { name: "description", content: "Welcome to BookingApp!" }];
 }
-async function login(nickName: string, password: string,authContext:AuthContextType) {
 
-
-  const worker: Worker = (await prisma.worker.findFirst({
-    where: { AND: { nickName: nickName, password: password } },
-  })) as Worker;
-
-  if (!worker) {
-    console.log(worker);
-
-    throw new Error("Invalid nickname or password");
-  }
-
-  authContext?.setWorker(worker);
-
-  return worker;
-}
-
-export async function action({ context ,request }: ActionFunctionArgs) {
+export async function action({ context, request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const nickName = formData.get("nickname") as string;
   const password = formData.get("password") as string;
@@ -43,16 +17,23 @@ export async function action({ context ,request }: ActionFunctionArgs) {
     if (!nickName || !password) {
       throw new Error("Nickname and Password are required");
     }
-    await login(nickName, password,context.get(AuthContext));
+    const worker: Worker = (await prisma.worker.findFirst({
+      where: { AND: { nickName: nickName, password: password } },
+    })) as Worker;
 
-    return redirect("/booking");
+    if (!worker) {
+      throw new Error("Invalid nickname or password");
+    }
+
+    return await createSession({ request, workerId: worker.personId, remember: true });
   } catch (error) {
-    return { error: (error as Error).message };
+    if (error instanceof Error) {
+      return { error: error.message };
+    }
   }
 }
 export default function Login() {
   const actionData = useActionData<typeof action>();
-
 
   return (
     <div className="max-w-md mx-auto">

@@ -765,13 +765,6 @@ export const personOrderByRelevanceFieldEnum = {
 export type personOrderByRelevanceFieldEnum = (typeof personOrderByRelevanceFieldEnum)[keyof typeof personOrderByRelevanceFieldEnum]
 
 
-export const roomOrderByRelevanceFieldEnum = {
-  type: 'type'
-} as const
-
-export type roomOrderByRelevanceFieldEnum = (typeof roomOrderByRelevanceFieldEnum)[keyof typeof roomOrderByRelevanceFieldEnum]
-
-
 export const workerOrderByRelevanceFieldEnum = {
   nickName: 'nickName',
   password: 'password'
@@ -804,6 +797,13 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'String'
  */
 export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
+    
+
+
+/**
+ * Reference to a field of type 'room_type'
+ */
+export type Enumroom_typeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'room_type'>
     
 
 

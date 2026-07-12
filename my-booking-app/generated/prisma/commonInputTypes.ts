@@ -99,6 +99,23 @@ export type StringWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedStringFilter<$PrismaModel>
 }
 
+export type Enumroom_typeFilter<$PrismaModel = never> = {
+  equals?: $Enums.room_type | Prisma.Enumroom_typeFieldRefInput<$PrismaModel>
+  in?: $Enums.room_type[]
+  notIn?: $Enums.room_type[]
+  not?: Prisma.NestedEnumroom_typeFilter<$PrismaModel> | $Enums.room_type
+}
+
+export type Enumroom_typeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.room_type | Prisma.Enumroom_typeFieldRefInput<$PrismaModel>
+  in?: $Enums.room_type[]
+  notIn?: $Enums.room_type[]
+  not?: Prisma.NestedEnumroom_typeWithAggregatesFilter<$PrismaModel> | $Enums.room_type
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumroom_typeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumroom_typeFilter<$PrismaModel>
+}
+
 export type Enumworker_roleFilter<$PrismaModel = never> = {
   equals?: $Enums.worker_role | Prisma.Enumworker_roleFieldRefInput<$PrismaModel>
   in?: $Enums.worker_role[]
@@ -210,6 +227,23 @@ export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedStringFilter<$PrismaModel>
   _max?: Prisma.NestedStringFilter<$PrismaModel>
+}
+
+export type NestedEnumroom_typeFilter<$PrismaModel = never> = {
+  equals?: $Enums.room_type | Prisma.Enumroom_typeFieldRefInput<$PrismaModel>
+  in?: $Enums.room_type[]
+  notIn?: $Enums.room_type[]
+  not?: Prisma.NestedEnumroom_typeFilter<$PrismaModel> | $Enums.room_type
+}
+
+export type NestedEnumroom_typeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.room_type | Prisma.Enumroom_typeFieldRefInput<$PrismaModel>
+  in?: $Enums.room_type[]
+  notIn?: $Enums.room_type[]
+  not?: Prisma.NestedEnumroom_typeWithAggregatesFilter<$PrismaModel> | $Enums.room_type
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumroom_typeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumroom_typeFilter<$PrismaModel>
 }
 
 export type NestedEnumworker_roleFilter<$PrismaModel = never> = {

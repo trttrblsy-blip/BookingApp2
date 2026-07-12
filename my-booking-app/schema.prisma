@@ -35,10 +35,15 @@ model person {
 model room {
   id       Int       @id @default(autoincrement())
   capacity Int
-  type     String
+  type     room_type
   booking  booking[]
 }
-
+enum room_type{
+ SINGLE
+ TRIPLE
+ CONNECTING
+ SUITE
+}
 model worker {
   personId Int         @unique(map: "Worker_personId_key")
   role     worker_role @default(WORKER)
@@ -54,3 +59,4 @@ enum worker_role {
   WORKER
   ADMIN
 }
+

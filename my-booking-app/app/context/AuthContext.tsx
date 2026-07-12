@@ -2,15 +2,15 @@ import { createContext, useState, useContext, type ReactElement } from "react";
 import type { Worker } from "~/utils/Worker";
 
 
-export interface AuthContextType {
+interface AuthContextType {
   worker: Worker | null;
   setWorker: React.Dispatch<React.SetStateAction<Worker | null>>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
-export default function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [worker, setWorker] = useState<Worker | null>(null);
+export default function AuthProvider({ children,newWorker}: { children: React.ReactNode ,newWorker:Worker}) {
+  const [worker, setWorker] = useState<Worker | null>(newWorker);
 
   return <AuthContext.Provider value={{ worker, setWorker }}>{children}</AuthContext.Provider>;
 }

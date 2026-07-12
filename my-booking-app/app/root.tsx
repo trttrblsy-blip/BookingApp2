@@ -1,7 +1,21 @@
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import {
+  data,
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLoaderData,
+  type LoaderFunctionArgs,
+} from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import AuthProvider from "./context/AuthContext";
+import { getCurrentWorker } from "./services/auth.server";
+import type { Worker } from "./utils/Worker";
+import { prisma } from "../lib/prisma";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -33,9 +47,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
+export async function loader({ request }: LoaderFunctionArgs) {
+  const worker = await getCurrentWorker(request);
+}
 
 export default function App() {
-  return <Outlet />;
+  const worker: Worker = useLoaderData();
+  return (
+    <AuthProvider newWorker={worker}>
+      <Outlet />
+    </AuthProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

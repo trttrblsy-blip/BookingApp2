@@ -39,13 +39,13 @@ export type RoomSumAggregateOutputType = {
 export type RoomMinAggregateOutputType = {
   id: number | null
   capacity: number | null
-  type: string | null
+  type: $Enums.room_type | null
 }
 
 export type RoomMaxAggregateOutputType = {
   id: number | null
   capacity: number | null
-  type: string | null
+  type: $Enums.room_type | null
 }
 
 export type RoomCountAggregateOutputType = {
@@ -174,7 +174,7 @@ export type roomGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type RoomGroupByOutputType = {
   id: number
   capacity: number
-  type: string
+  type: $Enums.room_type
   _count: RoomCountAggregateOutputType | null
   _avg: RoomAvgAggregateOutputType | null
   _sum: RoomSumAggregateOutputType | null
@@ -203,7 +203,7 @@ export type roomWhereInput = {
   NOT?: Prisma.roomWhereInput | Prisma.roomWhereInput[]
   id?: Prisma.IntFilter<"room"> | number
   capacity?: Prisma.IntFilter<"room"> | number
-  type?: Prisma.StringFilter<"room"> | string
+  type?: Prisma.Enumroom_typeFilter<"room"> | $Enums.room_type
   booking?: Prisma.BookingListRelationFilter
 }
 
@@ -212,7 +212,6 @@ export type roomOrderByWithRelationInput = {
   capacity?: Prisma.SortOrder
   type?: Prisma.SortOrder
   booking?: Prisma.bookingOrderByRelationAggregateInput
-  _relevance?: Prisma.roomOrderByRelevanceInput
 }
 
 export type roomWhereUniqueInput = Prisma.AtLeast<{
@@ -221,7 +220,7 @@ export type roomWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.roomWhereInput[]
   NOT?: Prisma.roomWhereInput | Prisma.roomWhereInput[]
   capacity?: Prisma.IntFilter<"room"> | number
-  type?: Prisma.StringFilter<"room"> | string
+  type?: Prisma.Enumroom_typeFilter<"room"> | $Enums.room_type
   booking?: Prisma.BookingListRelationFilter
 }, "id">
 
@@ -242,61 +241,55 @@ export type roomScalarWhereWithAggregatesInput = {
   NOT?: Prisma.roomScalarWhereWithAggregatesInput | Prisma.roomScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"room"> | number
   capacity?: Prisma.IntWithAggregatesFilter<"room"> | number
-  type?: Prisma.StringWithAggregatesFilter<"room"> | string
+  type?: Prisma.Enumroom_typeWithAggregatesFilter<"room"> | $Enums.room_type
 }
 
 export type roomCreateInput = {
   capacity: number
-  type: string
+  type: $Enums.room_type
   booking?: Prisma.bookingCreateNestedManyWithoutRoomInput
 }
 
 export type roomUncheckedCreateInput = {
   id?: number
   capacity: number
-  type: string
+  type: $Enums.room_type
   booking?: Prisma.bookingUncheckedCreateNestedManyWithoutRoomInput
 }
 
 export type roomUpdateInput = {
   capacity?: Prisma.IntFieldUpdateOperationsInput | number
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.Enumroom_typeFieldUpdateOperationsInput | $Enums.room_type
   booking?: Prisma.bookingUpdateManyWithoutRoomNestedInput
 }
 
 export type roomUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   capacity?: Prisma.IntFieldUpdateOperationsInput | number
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.Enumroom_typeFieldUpdateOperationsInput | $Enums.room_type
   booking?: Prisma.bookingUncheckedUpdateManyWithoutRoomNestedInput
 }
 
 export type roomCreateManyInput = {
   id?: number
   capacity: number
-  type: string
+  type: $Enums.room_type
 }
 
 export type roomUpdateManyMutationInput = {
   capacity?: Prisma.IntFieldUpdateOperationsInput | number
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.Enumroom_typeFieldUpdateOperationsInput | $Enums.room_type
 }
 
 export type roomUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   capacity?: Prisma.IntFieldUpdateOperationsInput | number
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.Enumroom_typeFieldUpdateOperationsInput | $Enums.room_type
 }
 
 export type RoomScalarRelationFilter = {
   is?: Prisma.roomWhereInput
   isNot?: Prisma.roomWhereInput
-}
-
-export type roomOrderByRelevanceInput = {
-  fields: Prisma.roomOrderByRelevanceFieldEnum | Prisma.roomOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
 }
 
 export type roomCountOrderByAggregateInput = {
@@ -341,15 +334,19 @@ export type roomUpdateOneRequiredWithoutBookingNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.roomUpdateToOneWithWhereWithoutBookingInput, Prisma.roomUpdateWithoutBookingInput>, Prisma.roomUncheckedUpdateWithoutBookingInput>
 }
 
+export type Enumroom_typeFieldUpdateOperationsInput = {
+  set?: $Enums.room_type
+}
+
 export type roomCreateWithoutBookingInput = {
   capacity: number
-  type: string
+  type: $Enums.room_type
 }
 
 export type roomUncheckedCreateWithoutBookingInput = {
   id?: number
   capacity: number
-  type: string
+  type: $Enums.room_type
 }
 
 export type roomCreateOrConnectWithoutBookingInput = {
@@ -370,13 +367,13 @@ export type roomUpdateToOneWithWhereWithoutBookingInput = {
 
 export type roomUpdateWithoutBookingInput = {
   capacity?: Prisma.IntFieldUpdateOperationsInput | number
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.Enumroom_typeFieldUpdateOperationsInput | $Enums.room_type
 }
 
 export type roomUncheckedUpdateWithoutBookingInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   capacity?: Prisma.IntFieldUpdateOperationsInput | number
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.Enumroom_typeFieldUpdateOperationsInput | $Enums.room_type
 }
 
 
@@ -440,7 +437,7 @@ export type $roomPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     capacity: number
-    type: string
+    type: $Enums.room_type
   }, ExtArgs["result"]["room"]>
   composites: {}
 }
@@ -813,7 +810,7 @@ export interface Prisma__roomClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface roomFieldRefs {
   readonly id: Prisma.FieldRef<"room", 'Int'>
   readonly capacity: Prisma.FieldRef<"room", 'Int'>
-  readonly type: Prisma.FieldRef<"room", 'String'>
+  readonly type: Prisma.FieldRef<"room", 'room_type'>
 }
     
 

@@ -9,6 +9,16 @@
 * 🟢 You can import this file directly.
 */
 
+export const room_type= {
+  SINGLE: 'SINGLE',
+  TRIPLE: 'TRIPLE',
+  CONNECTING: 'CONNECTING',
+  SUITE: 'SUITE'
+} as const
+
+export type room_type = (typeof room_type)[keyof typeof room_type]
+
+
 export const worker_role = {
   WORKER: 'WORKER',
   ADMIN: 'ADMIN'
