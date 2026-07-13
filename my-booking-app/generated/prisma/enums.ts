@@ -9,7 +9,7 @@
 * 🟢 You can import this file directly.
 */
 
-export const room_type= {
+export const room_type = {
   SINGLE: 'SINGLE',
   TRIPLE: 'TRIPLE',
   CONNECTING: 'CONNECTING',

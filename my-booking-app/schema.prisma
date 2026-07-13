@@ -13,6 +13,7 @@ model booking {
   roomId     Int
   custumerId Int
   workerId   Int
+  amount Int
   startDate  DateTime
   endDate    DateTime
   person     person   @relation(fields: [custumerId], references: [id], map: "Booking_custumerId_fkey")

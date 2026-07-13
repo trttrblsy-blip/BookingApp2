@@ -5,5 +5,6 @@ export default interface Booking {
   workerId: number;
   startDate: Date;
   endDate: Date;
+  amount:number;
 }
 

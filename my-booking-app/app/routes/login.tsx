@@ -8,7 +8,7 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "BookingApp" }, { name: "description", content: "Welcome to BookingApp!" }];
 }
 
-export async function action({ context, request }: ActionFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const nickName = formData.get("nickname") as string;
   const password = formData.get("password") as string;
