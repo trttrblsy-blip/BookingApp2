@@ -2,7 +2,7 @@ import { Form, redirect, useActionData, type ActionFunctionArgs } from "react-ro
 import type { Worker } from "../utils/Worker";
 import type { Route } from "./+types/login";
 import { createSession } from "~/services/session.server";
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../services/prisma.server";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "BookingApp" }, { name: "description", content: "Welcome to BookingApp!" }];
@@ -32,7 +32,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
   }
 }
-export default function Login() {
+const Login = () => {
   const actionData = useActionData<typeof action>();
 
   return (
@@ -51,11 +51,13 @@ export default function Login() {
           </label>
           <input className="border border-gray-300 rounded px-3 py-2 w-full" type="password" name="password" />
         </div>
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+        <button type="submit" className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-500">
           Login
         </button>
         {actionData?.error && <div className=" text-red-800 p-2 mb-4 rounded"> {actionData.error} </div>}
       </Form>
     </div>
   );
-}
+};
+
+export default Login;

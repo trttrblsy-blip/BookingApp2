@@ -1,23 +1,30 @@
-import { Form, useLoaderData } from "react-router";
+import { Form, useLoaderData, useSubmit } from "react-router";
 import type { Route } from "../+types/root";
 import type Room from "~/utils/Room";
 import { room_type } from "../../generated/prisma/enums";
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../services/prisma.server";
 import NewBooking from "~/components/newBooking";
 import { useState } from "react";
-import ModalProvider, { useModal } from "~/context/ModalContext";
+
 import type { BookingDTO } from "~/utils/BookingDTO";
+import { ModalContext } from "~/context/ModalContext";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
+  if (!url.searchParams.get("startDate")) {
+    return {
+      rooms: [],
+      isSearched: false,
+    };
+  }
   const startDate = new Date(url.searchParams.get("startDate") as string);
   const endDate = new Date(url.searchParams.get("endDate") as string);
-  const amount = new Number(url.searchParams.get("amount")) as number;
-  const roomType = url.searchParams.get("roomType") as room_type;
+  const amount = Number(url.searchParams.get("amount"));
+  const roomType: room_type = room_type[url.searchParams.get("roomType") as keyof typeof room_type];
   const rooms = await prisma.room.findMany({
     where: {
       AND: {
-        capacity: { lte: amount },
+        capacity: { gte: amount },
         booking: {
           none: {
             OR: [
@@ -29,61 +36,66 @@ export async function loader({ request }: Route.LoaderArgs) {
         type: roomType,
       },
     },
-    
   });
-  return { rooms, startDate, endDate, amount };
+  return { rooms, startDate, endDate, amount, isSearched: true };
 }
 
-export default function Booking() {
-  const modalContext = useModal();
-  const [isSearched, setIssearched] = useState(false);
-  const loaderData = useLoaderData();
-  setIssearched(true);
+const Booking = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const loaderData = useLoaderData<typeof loader>();
   const rooms: Room[] = loaderData.rooms;
-  const [bookingDTO, setBookingDTO] = useState<BookingDTO | null>(null);
-  function openModal(event: React.MouseEvent<HTMLButtonElement>) {
+  const [bookingDTO, setBookingDTO] = useState<BookingDTO>();
+  const openModal = (event: React.MouseEvent<HTMLButtonElement>) => {
     setBookingDTO({
       roomId: Number.parseInt(event.currentTarget.id),
-      startDate: loaderData.startDate,
-      endDate: loaderData.endDate,
-      amount: loaderData.amount,
+      startDate: loaderData.startDate!,
+      endDate: loaderData.endDate!,
+      amount: loaderData.amount!,
     });
-    modalContext?.setIsModalOpen(true);
-  }
+    setIsOpen(true);
+  };
+
   return (
-    <ModalProvider>
-      <div className="max-w-md mx-auto">
-        {modalContext?.isModalOpen && <NewBooking bookingDTO={bookingDTO!}></NewBooking>}
-        <Form className="space-y-4 bg-white p-4 rounded shadow" method="get">
-          <label className="block text-gray-700">from</label>
-          <input className="border border-gray-300 rounded px-3 py-2 w-full" type="date" name="startDate" />
-          <label className="block text-gray-700">to</label>
-          <input className="border border-gray-300 rounded px-3 py-2 w-full" type="date" name="endDate" />
-          <label className="block text-gray-700">amount</label>
-          <input className="border border-gray-300 rounded px-3 py-2 w-full" type="namber" name="amount" />
-          <label className="block text-gray-700">type</label>
-          <select className="form-control" name="roomType">
-            {Object.values(room_type).map((type) => (
-              <option>{type}</option>
-            ))}
-          </select>
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+    <div>
+      {isOpen && <NewBooking bookingDTO={bookingDTO!} isOpen={isOpen}></NewBooking>}
+
+      <div className="conteiner p-4 ">
+        <Form className="conteiner-fluid space-y-4 bg-white p-4 rounded shadow mb-4" method="get">
+          <div className="input-group mb-3  p-4 flex justify-center items-center conteiner-fluid ">
+            <label className="block text-gray-700 px-4">from</label>
+            <input className="border border-gray-300 rounded px-4 py-2 " type="date" name="startDate" required />
+            <label className="block text-gray-700 px-4">to</label>
+            <input className="border border-gray-300 rounded px-4 py-2 " type="date" name="endDate" required/>
+            <label className="block text-gray-700 px-4">amount</label>
+            <input className="border border-gray-300 rounded" type="namber" name="amount" required/>
+            <label className="block text-gray-700 px-4"></label>
+            <select className="form-control  px-4 py-2 rounded border border-gray-300 " name="roomType">
+              <option value="">type</option>
+              {Object.values(room_type).map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button type="submit" className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-500">
             search rooms
           </button>
         </Form>
-        {isSearched && (
-          <ul className="space-y-4">
-            {rooms.map((room) => (
-              <li className="p-4 bg-white rounded shadow">
-                <button className="block text-pink-600" onClick={openModal} id={room.id.toString()}>
+        <ul className="space-y-4 py-4">
+          {loaderData.isSearched &&
+            loaderData.rooms.map((room) => (
+              <li className=" bg-white rounded shadow " key={room.id.toString()}>
+                <button className=" text-teal-600 " onClick={openModal} id={room.id.toString()}>
                   <span className="font-semibold text-xl">{room.id}</span>
-                  <p className="text-gray-700">{room.type}</p>
+                  <p className="text-gray-700">{room_type[room.type as keyof typeof room_type]}</p>
                 </button>
               </li>
             ))}
-          </ul>
-        )}
+        </ul>
       </div>
-    </ModalProvider>
+    </div>
   );
-}
+};
+
+export default Booking;

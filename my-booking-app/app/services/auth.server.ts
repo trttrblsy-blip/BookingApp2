@@ -1,9 +1,7 @@
-
 import { PrismaClient } from "../../generated/prisma/client";
 import type { Worker } from "~/utils/Worker";
 import { sessionStorage } from "./session.server";
-import { prisma } from "../../lib/prisma";
-
+import { prisma } from "./prisma.server";
 
 export async function getCurrentWorker(request: Request) {
   const session = await sessionStorage.getSession(request.headers.get("Cookie"));

@@ -15,8 +15,6 @@ import "./app.css";
 import AuthProvider from "./context/AuthContext";
 import { getCurrentWorker } from "./services/auth.server";
 import type { Worker } from "./utils/Worker";
-import { prisma } from "../lib/prisma";
-
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {

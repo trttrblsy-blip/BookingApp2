@@ -1,7 +1,8 @@
+import type { room_type } from "../../generated/prisma/enums";
 
 
 export default interface Room {
   id: number;
   capacity: number;
-  type: string;
+  type: room_type;
 }
