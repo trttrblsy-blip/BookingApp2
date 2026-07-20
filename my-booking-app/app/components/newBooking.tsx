@@ -18,8 +18,15 @@ export default function NewBooking({ bookingDTO, isOpen }: { bookingDTO: Booking
   return (
     <div>
       <Modal isOpen={isOpen} style={customStyles} contentLabel="Example Modal">
-        <h2>Booking to room number {bookingDTO.roomId} </h2>
         <Form method="post" action="/actions/addBooking">
+          <label className="block text-gray-700">Booking to room number</label>
+          <input
+            className="border border-gray-300 rounded px-3 py-2 w-full"
+            type="text"
+            name="roomId"
+            value={bookingDTO.roomId}
+            disabled
+          />
           <label className="block text-gray-700">from</label>
           <input
             className="border border-gray-300 rounded px-3 py-2 w-full"

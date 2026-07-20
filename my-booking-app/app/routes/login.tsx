@@ -1,14 +1,15 @@
 import { Form, redirect, useActionData, type ActionFunctionArgs } from "react-router";
 import type { Worker } from "../utils/Worker";
 import type { Route } from "./+types/login";
-import { createSession } from "~/services/session.server";
 import { prisma } from "../services/prisma.server";
+import { workerContext } from "~/context/AuthContext";
+import { createSession } from "~/services/session.server";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "BookingApp" }, { name: "description", content: "Welcome to BookingApp!" }];
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request, context }: ActionFunctionArgs) {
   const formData = await request.formData();
   const nickName = formData.get("nickname") as string;
   const password = formData.get("password") as string;
@@ -24,8 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (!worker) {
       throw new Error("Invalid nickname or password");
     }
-
-    return await createSession({ request, workerId: worker.personId, remember: true });
+    return await createSession({ request, workerId: worker.personId, redirectUrl: "/booking", remember: true });
   } catch (error) {
     if (error instanceof Error) {
       return { error: error.message };
@@ -34,7 +34,6 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 const Login = () => {
   const actionData = useActionData<typeof action>();
-
   return (
     <div className="max-w-md mx-auto">
       <h2 className="text-2xl font-bold mb-4">Please log in</h2>
