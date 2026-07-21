@@ -715,7 +715,6 @@ export const BookingScalarFieldEnum = {
   roomId: 'roomId',
   custumerId: 'custumerId',
   workerId: 'workerId',
-  amount: 'amount',
   startDate: 'startDate',
   endDate: 'endDate'
 } as const

@@ -1,8 +1,7 @@
-import { Form, redirect, useActionData, type ActionFunctionArgs } from "react-router";
+import { Form, useActionData, type ActionFunctionArgs } from "react-router";
 import type { Worker } from "../utils/Worker";
 import type { Route } from "./+types/login";
 import { prisma } from "../services/prisma.server";
-import { workerContext } from "~/context/AuthContext";
 import { createSession } from "~/services/session.server";
 
 export function meta({}: Route.MetaArgs) {
@@ -28,6 +27,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return await createSession({ request, workerId: worker.personId, redirectUrl: "/booking", remember: true });
   } catch (error) {
     if (error instanceof Error) {
+      console.log(error);
       return { error: error.message };
     }
   }

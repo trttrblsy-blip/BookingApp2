@@ -1,16 +1,19 @@
-import { Form, useLoaderData, useOutletContext } from "react-router";
+import { Form, useActionData, useLoaderData, useNavigate } from "react-router";
 import type { Route } from "../+types/root";
 import type Room from "~/utils/Room";
-import { room_type } from "../../generated/prisma/enums";
+import { room_type, worker_role } from "../../generated/prisma/enums";
 import { prisma } from "../services/prisma.server";
 import NewBooking from "~/components/newBooking";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import type { BookingDTO } from "~/utils/BookingDTO";
 import type { Worker } from "~/utils/Worker";
-import { workerContext } from "~/context/AuthContext";
-import { getCurrentWorker } from "~/services/auth.server";
 
-export async function loader({ request, context }: Route.LoaderArgs) {
+import { getCurrentWorker } from "~/services/auth.server";
+import TypesDropdown from "~/components/typesDropdown";
+import type { action } from "./actions/addBooking";
+import { AlertDemo } from "~/components/alerDemo";
+
+export async function loader({ request }: Route.LoaderArgs) {
   const worker = await getCurrentWorker(request);
   const url = new URL(request.url);
   if (!url.searchParams.get("startDate")) {
@@ -23,7 +26,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const startDate = new Date(url.searchParams.get("startDate") as string);
   const endDate = new Date(url.searchParams.get("endDate") as string);
   const amount = Number(url.searchParams.get("amount"));
-  const roomType: room_type = room_type[url.searchParams.get("roomType") as keyof typeof room_type];
+  const roomType: room_type = url.searchParams.get("roomType") as string as room_type;
   const rooms = await prisma.room.findMany({
     where: {
       AND: {
@@ -36,7 +39,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
             ],
           },
         },
-        type: roomType,
+        /*type: roomType,*/
       },
     },
   });
@@ -44,7 +47,10 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 }
 
 const Booking = () => {
+  const navigate = useNavigate();
   const loaderData = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+
   const worker: Worker = loaderData.worker!;
   const [isOpen, setIsOpen] = useState(false);
   const rooms: Room[] = loaderData.rooms;
@@ -61,8 +67,8 @@ const Booking = () => {
 
   return (
     <div>
+      {actionData?.error && <AlertDemo description={actionData.error} iserror={true}></AlertDemo>}
       {isOpen && <NewBooking bookingDTO={bookingDTO!} isOpen={isOpen}></NewBooking>}
-
       <div> hello, {worker.nickName}</div>
       <div className="conteiner p-4 ">
         <Form className="conteiner-fluid space-y-4 bg-white p-4 rounded shadow mb-4" method="get">
@@ -72,16 +78,9 @@ const Booking = () => {
             <label className="block text-gray-700 px-4">to</label>
             <input className="border border-gray-300 rounded px-4 py-2 " type="date" name="endDate" required />
             <label className="block text-gray-700 px-4">amount</label>
-            <input className="border border-gray-300 rounded" type="namber" name="amount" required />
+            <input className="border border-gray-300 rounded" type="number" name="amount" required />
             <label className="block text-gray-700 px-4"></label>
-            <select className="form-control  px-4 py-2 rounded border border-gray-300 " name="roomType">
-              <option value="">type</option>
-              {Object.values(room_type).map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
+            <TypesDropdown></TypesDropdown>
           </div>
           <button type="submit" className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-500">
             search rooms
@@ -99,6 +98,16 @@ const Booking = () => {
             ))}
         </ul>
       </div>
+      {worker.role == worker_role.ADMIN && (
+        <button
+          className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-500 absolute bottom-4 "
+          onClick={() => {
+            navigate("/admin");
+          }}
+        >
+          admin page
+        </button>
+      )}
     </div>
   );
 };

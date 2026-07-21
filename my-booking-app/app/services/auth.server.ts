@@ -6,7 +6,6 @@ import { prisma } from "./prisma.server";
 export async function getCurrentWorker(request: Request) {
   const session = await sessionStorage.getSession(request.headers.get("Cookie"));
   const workerId = session.get("workerId");
-  console.log("workerId:", workerId)
   if (!workerId) {
     return null;
   }

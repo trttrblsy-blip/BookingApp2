@@ -1,7 +1,9 @@
 import type { BookingDTO } from "~/utils/BookingDTO";
 import Modal from "react-modal";
-import { Form, type ActionFunctionArgs } from "react-router";
+import { Form, useActionData } from "react-router";
 import { format } from "date-fns";
+import type { action } from "~/routes/actions/addBooking";
+import { AlertDemo } from "./alerDemo";
 
 const customStyles = {
   content: {
@@ -14,9 +16,11 @@ const customStyles = {
   },
 };
 
-export default function NewBooking({ bookingDTO, isOpen }: { bookingDTO: BookingDTO; isOpen: boolean }) {
+const NewBooking = ({ bookingDTO, isOpen }: { bookingDTO: BookingDTO; isOpen: boolean }) => {
+  const actionData = useActionData<typeof action>();
   return (
     <div>
+      {actionData?.error && <AlertDemo description={actionData.error} iserror={true}></AlertDemo>}
       <Modal isOpen={isOpen} style={customStyles} contentLabel="Example Modal">
         <Form method="post" action="/actions/addBooking">
           <label className="block text-gray-700">Booking to room number</label>
@@ -25,7 +29,7 @@ export default function NewBooking({ bookingDTO, isOpen }: { bookingDTO: Booking
             type="text"
             name="roomId"
             value={bookingDTO.roomId}
-            disabled
+            readOnly
           />
           <label className="block text-gray-700">from</label>
           <input
@@ -33,7 +37,7 @@ export default function NewBooking({ bookingDTO, isOpen }: { bookingDTO: Booking
             type="date"
             name="startDate"
             value={format(bookingDTO.startDate, "yyyy-MM-dd")}
-            disabled
+            readOnly
           />
           <label className="block text-gray-700">to</label>
           <input
@@ -41,15 +45,15 @@ export default function NewBooking({ bookingDTO, isOpen }: { bookingDTO: Booking
             type="date"
             name="endDate"
             value={format(bookingDTO.endDate, "yyyy-MM-dd")}
-            disabled
+            readOnly
           />
           <label className="block text-gray-700">amount</label>
           <input
             className="border border-gray-300 rounded px-3 py-2 w-full"
-            type="namber"
+            type="number"
             name="amount"
             value={bookingDTO.amount}
-            disabled
+            readOnly
           />
           <label className="block text-gray-700">custumer name:</label>
           <input className="border border-gray-300 rounded px-3 py-2 w-full" type="text" name="custumerName" />
@@ -64,4 +68,5 @@ export default function NewBooking({ bookingDTO, isOpen }: { bookingDTO: Booking
       </Modal>
     </div>
   );
-}
+};
+export default NewBooking;

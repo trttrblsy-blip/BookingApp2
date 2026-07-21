@@ -5,6 +5,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url:env("DATABASE_URL"),
+    url:"mysql://root:2828@127.0.0.1:3306/booking",
   },
   },)
