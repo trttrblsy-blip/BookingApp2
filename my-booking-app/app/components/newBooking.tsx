@@ -1,6 +1,6 @@
 import type { BookingDTO } from "~/utils/BookingDTO";
 import Modal from "react-modal";
-import { Form, useActionData } from "react-router";
+import { Form, useActionData, useFetcher } from "react-router";
 import { format } from "date-fns";
 import type { action } from "~/routes/actions/addBooking";
 import { AlertDemo } from "./alerDemo";
@@ -17,10 +17,8 @@ const customStyles = {
 };
 
 const NewBooking = ({ bookingDTO, isOpen }: { bookingDTO: BookingDTO; isOpen: boolean }) => {
-  const actionData = useActionData<typeof action>();
   return (
     <div>
-      {actionData?.error && <AlertDemo description={actionData.error} iserror={true}></AlertDemo>}
       <Modal isOpen={isOpen} style={customStyles} contentLabel="Example Modal">
         <Form method="post" action="/actions/addBooking">
           <label className="block text-gray-700">Booking to room number</label>

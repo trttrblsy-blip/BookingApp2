@@ -25,6 +25,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
   const startDate = new Date(url.searchParams.get("startDate") as string);
   const endDate = new Date(url.searchParams.get("endDate") as string);
+  if (startDate > endDate) {
+    throw Error("start date cant be after the end date!");
+  }
   const amount = Number(url.searchParams.get("amount"));
   const roomType: room_type = url.searchParams.get("roomType") as string as room_type;
   const rooms = await prisma.room.findMany({
@@ -48,13 +51,11 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 const Booking = () => {
   const navigate = useNavigate();
-  const loaderData = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
-
-  const worker: Worker = loaderData.worker!;
+  const [error, setError] = useState<Error | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const rooms: Room[] = loaderData.rooms;
   const [bookingDTO, setBookingDTO] = useState<BookingDTO>();
+  const loaderData = useLoaderData<typeof loader>();
+  const worker: Worker = loaderData.worker!;
   const openModal = (event: React.MouseEvent<HTMLButtonElement>) => {
     setBookingDTO({
       roomId: Number.parseInt(event.currentTarget.id),
@@ -64,10 +65,17 @@ const Booking = () => {
     });
     setIsOpen(true);
   };
+  try {
+    const actionData = useActionData<typeof action>();
+    const rooms: Room[] = loaderData.rooms;
+  } catch (error) {
+    if (error instanceof Error) {
+      setError(error);
+    }
+  }
 
   return (
     <div>
-      {actionData?.error && <AlertDemo description={actionData.error} iserror={true}></AlertDemo>}
       {isOpen && <NewBooking bookingDTO={bookingDTO!} isOpen={isOpen}></NewBooking>}
       <div> hello, {worker.nickName}</div>
       <div className="conteiner p-4 ">
@@ -98,6 +106,7 @@ const Booking = () => {
             ))}
         </ul>
       </div>
+      {error && <AlertDemo description={error.message} iserror={true} isOpen={true}></AlertDemo>}
       {worker.role == worker_role.ADMIN && (
         <button
           className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-500 absolute bottom-4 "

@@ -1,40 +1,85 @@
-import { Form, useActionData, useNavigate } from "react-router";
+import { Form, useActionData, useNavigate, type ActionFunctionArgs } from "react-router";
 import TypesDropdown from "~/components/typesDropdown";
-import { useEffect } from "react";
-import type { action as actionWorker } from "./actions/addWorker";
-import type { action as actionRoom } from "./actions/addRoom";
+import type * as $Enums from "../../generated/prisma/enums";
+import { AlertDemo } from "~/components/alerDemo";
+import { room_type } from "../../generated/prisma/enums";
+import { prisma } from "~/services/prisma.server";
+import { format } from "date-fns";
+import type { person } from "../../generated/prisma/client";
+export async function action({ request }: ActionFunctionArgs) {
+  try {
+    const dataForm = await request.formData();
+    if (dataForm.get("capacity")) {
+      const capacity: number = Number.parseInt(dataForm.get("capacity") as string);
+      const type: room_type = room_type[dataForm.get("roomType") as keyof typeof room_type];
+      await prisma.room.create({
+        data: { capacity, type },
+      });
+      return { secsses: true, action: "room", message: "good job!" };
+    } else if (dataForm.get("workerName")) {
+      const workerName: string = dataForm.get("workerName") as string;
+      const workerId: number = Number.parseInt(dataForm.get("workerId") as string);
+      const workerBirthday: Date = new Date(dataForm.get("workerBirthday") as string);
+
+      if (new Date().getFullYear() - workerBirthday.getFullYear() < 18) {
+        throw new Error("vaulation! cant imploy minors!");
+      }
+      const nickName: string = workerName.split(" ")[0] + "123";
+      const password: string = format(workerBirthday, "yyyy-MM-dd") + workerName.split(" ")[0].slice(0, 3);
+      const worker: person = { id: workerId, birthDay: workerBirthday, fullName: workerName };
+
+      await prisma.worker.create({
+        data: {
+          person: { create: { ...worker } },
+          nickName,
+          password,
+        },
+      });
+
+      return { secsses: true, action: "worker", message: "nickname: " + nickName + "\n password: " + password };
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      return { secsses: false, error: error.message };
+    }
+  }
+}
 
 const Admin = () => {
   const navigate = useNavigate();
-  const actionDataWorker = useActionData<typeof actionWorker>();
-  const actionDataRoom = useActionData<typeof actionRoom>();
-  console.log(actionDataRoom);
-  useEffect(() => {
-    if (actionDataWorker?.nickName) {
-      alert(
-        "worker added secsesfully!\n nickname:" +
-          actionDataWorker.nickName +
-          "\n password: " +
-          actionDataWorker.password,
-      );
-    }
-  });
+  const actionData = useActionData<typeof action>();
   return (
     <div>
+      {actionData?.secsses == false && (
+        <AlertDemo description={actionData!.error!} iserror={true} isOpen={true}></AlertDemo>
+      )}
+      {actionData?.secsses == true && (
+        <AlertDemo
+          title={actionData.action + " added secssfully!"}
+          description={actionData?.message!}
+          iserror={false}
+          isOpen={true}
+        />
+      )}
       <div className="flex flex-direction: row  mx-auto gap-4 justify-center">
-        <Form method="post" action="/actions/addWorker" className="space-y-4 bg-white p-4 rounded shadow">
+        <Form method="post" className="space-y-4 bg-white p-4 rounded shadow">
           <label className="block text-gray-700">worker ID:</label>
-          <input className="border border-gray-300 rounded px-3 py-2 w-full" type="text" name="workerId" />
+          <input className="border border-gray-300 rounded px-3 py-2 w-full" type="text" name="workerId" required />
           <label className="block text-gray-700">worker full name:</label>
-          <input className="border border-gray-300 rounded px-3 py-2 w-full" type="text" name="workerName" />
+          <input className="border border-gray-300 rounded px-3 py-2 w-full" type="text" name="workerName" required />
           <label className="block text-gray-700">worker birthday:</label>
-          <input className="border border-gray-300 rounded px-3 py-2 w-full" type="date" name="workerBirthday" />
+          <input
+            className="border border-gray-300 rounded px-3 py-2 w-full"
+            type="date"
+            name="workerBirthday"
+            required
+          />
           <button type="submit" className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-black-500">
             Add worker
           </button>
         </Form>
 
-        <Form method="post" action="/actions/addRoom" className="space-y-4 bg-white p-4 rounded shadow">
+        <Form method="post" className="space-y-4 bg-white p-4 rounded shadow">
           <div className="input-group pb-4 ">
             <label className="block text-gray-700 pb-4">capacity:</label>
             <input className="border border-gray-300 rounded px-3 py-2 w-full mb-4" type="number" name="capacity" />
@@ -45,6 +90,7 @@ const Admin = () => {
           </button>
         </Form>
       </div>
+
       <button
         className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-500 absolute bottom-4"
         onClick={() => {

@@ -18,27 +18,22 @@ export async function action({ request }: ActionFunctionArgs) {
   const custumerName: string = dataForm.get("custumerName") as string;
   const custumerId: number = Number.parseInt(dataForm.get("custumerId") as string);
   const custumerBirthday: Date = new Date(dataForm.get("custumerBirthday") as string);
-  try {
-    if (new Date().getFullYear() - custumerBirthday.getFullYear() < 18) {
-      throw new Error("vaulation! cant book for minors!");
-    }
-    const custumer: person = { id: custumerId, birthDay: custumerBirthday, fullName: custumerName };
-    const worker: Worker = (await getCurrentWorker(request))!;
 
-    await prisma.booking.create({
-      data: {
-        room: { connect: { id: roomId } },
-        startDate: startDate,
-        endDate: endDate,
-        person: { connectOrCreate: { create: { ...custumer }, where: { id: custumerId } } },
-        worker: { connect: { personId: worker.personId } },
-      },
-    });
-
-    return redirect("/booking");
-  } catch (error) {
-    if (error instanceof Error) {
-      return { error: error.message };
-    }
+  if (new Date().getFullYear() - custumerBirthday.getFullYear() < 18) {
+    throw new Error("vaulation! cant book for minors!");
   }
+  const custumer: person = { id: custumerId, birthDay: custumerBirthday, fullName: custumerName };
+  const worker: Worker = (await getCurrentWorker(request))!;
+
+  await prisma.booking.create({
+    data: {
+      room: { connect: { id: roomId } },
+      startDate: startDate,
+      endDate: endDate,
+      person: { connectOrCreate: { create: { ...custumer }, where: { id: custumerId } } },
+      worker: { connect: { personId: worker.personId } },
+    },
+  });
+
+  return redirect("/booking");
 }
