@@ -1,14 +1,14 @@
 import { Form, useActionData, type ActionFunctionArgs } from "react-router";
 import type { Worker } from "../utils/Worker";
 import type { Route } from "./+types/login";
-import { prisma } from "../services/prisma.server";
 import { createSession } from "~/services/session.server";
+import { auth } from "~/services/worker.server";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "BookingApp" }, { name: "description", content: "Welcome to BookingApp!" }];
 }
 
-export async function action({ request}: ActionFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const nickName = formData.get("nickname") as string;
   const password = formData.get("password") as string;
@@ -17,10 +17,9 @@ export async function action({ request}: ActionFunctionArgs) {
     if (!nickName || !password) {
       throw new Error("Nickname and Password are required");
     }
-    const worker: Worker = (await prisma.worker.findFirst({
-      where: { AND: { nickName: nickName, password: password } },
-    })) as Worker;
 
+    const worker: Worker = await auth(nickName, password);
+   
     if (!worker) {
       throw new Error("Invalid nickname or password");
     }

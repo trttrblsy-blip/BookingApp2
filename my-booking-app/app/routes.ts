@@ -4,9 +4,5 @@ export default [
   route("/", "routes/login.tsx"),
   route("booking", "routes/booking.tsx"),
   route("admin", "routes/admin.tsx"),
-  ...prefix("actions", [
-    route("/addBooking", "routes/actions/addBooking.ts"),
-    route("/addWorker", "routes/actions/addWorker.ts"),
-    route("/addRoom", "routes/actions/addRoom.ts"),
-  ]),
+  ...prefix("actions", [route("/addBooking", "routes/actions/addBooking.ts")]),
 ] satisfies RouteConfig;

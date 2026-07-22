@@ -42,6 +42,7 @@ export async function createSession({
 }) {
   const session = await getWorkerSession(request);
   session.set(WORKER_SESSION_KEY, workerId);
+
   return redirect(redirectUrl || "/booking", {
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session, {
