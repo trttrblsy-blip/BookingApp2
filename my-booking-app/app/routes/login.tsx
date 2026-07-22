@@ -8,7 +8,7 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "BookingApp" }, { name: "description", content: "Welcome to BookingApp!" }];
 }
 
-export async function action({ request, context }: ActionFunctionArgs) {
+export async function action({ request}: ActionFunctionArgs) {
   const formData = await request.formData();
   const nickName = formData.get("nickname") as string;
   const password = formData.get("password") as string;
@@ -27,7 +27,6 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return await createSession({ request, workerId: worker.personId, redirectUrl: "/booking", remember: true });
   } catch (error) {
     if (error instanceof Error) {
-      console.log(error);
       return { error: error.message };
     }
   }

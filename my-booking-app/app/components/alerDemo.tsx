@@ -1,15 +1,50 @@
-import { CheckCircle2Icon,  AlertCircleIcon } from "lucide-react";
+import { CheckCircle2Icon, AlertCircleIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import { Button } from "./ui/button";
+import { useState } from "react";
 
-export function AlertDemo({ title, description, iserror }: { title?: string; description: string; iserror: boolean }) {
+export function AlertDemo({
+  title,
+  description,
+  iserror,
+  isOpen,
+}: {
+  title?: string;
+  description: string;
+  iserror: boolean;
+  isOpen: boolean;
+}) {
+  const [open, setOpen] = useState(isOpen);
   return (
-    <div className="grid w-full max-w-md items-start gap-4">
-      <Alert >
-        {!iserror && <CheckCircle2Icon />}
-        {iserror && <AlertCircleIcon />}
-        <AlertTitle>{title||"Ërror!"}</AlertTitle>
-        <AlertDescription>{description}</AlertDescription>
-      </Alert>
-    </div>
+    <AlertDialog open={open}>
+      <AlertDialogContent className={iserror ? "text-destructive" : "text-success"}>
+        <AlertDialogHeader>
+          {iserror && <AlertCircleIcon />}
+          {!iserror && <CheckCircle2Icon />}
+          <AlertDialogTitle>{title || "Ërror!"}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogAction
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            Close
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
