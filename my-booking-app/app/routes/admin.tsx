@@ -22,7 +22,7 @@ export async function action({ request }: ActionFunctionArgs) {
       if (new Date().getFullYear() - workerBirthday.getFullYear() < 18) {
         throw new Error("vaulation! cant imploy minors!");
       }
-      const nickName: string = workerName.split(" ")[0] + "123";
+      const nickName: string = workerName.split(" ")[0] + Math.floor(Math.random() * 899 + 100);
       const password: string = format(workerBirthday, "yyyy-MM-dd") + workerName.split(" ")[0].slice(0, 3);
       const worker: person = { id: workerId, birthDay: workerBirthday, fullName: workerName };
       await createWorker(worker, nickName, password);

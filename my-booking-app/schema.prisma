@@ -48,7 +48,7 @@ model worker {
   personId Int         @unique(map: "Worker_personId_key")
   role     worker_role @default(WORKER)
   nickName String      @unique(map: "Worker_nickName_key")
-  password String      @unique(map: "Worker_password_key")
+  password String     
   booking  booking[]
   person   person      @relation(fields: [personId], references: [id], map: "Worker_personId_fkey")
 

@@ -225,14 +225,14 @@ export type workerOrderByWithRelationInput = {
 export type workerWhereUniqueInput = Prisma.AtLeast<{
   personId?: number
   nickName?: string
-  password?: string
   AND?: Prisma.workerWhereInput | Prisma.workerWhereInput[]
   OR?: Prisma.workerWhereInput[]
   NOT?: Prisma.workerWhereInput | Prisma.workerWhereInput[]
   role?: Prisma.Enumworker_roleFilter<"worker"> | $Enums.worker_role
+  password?: Prisma.StringFilter<"worker"> | string
   booking?: Prisma.BookingListRelationFilter
   person?: Prisma.XOR<Prisma.PersonScalarRelationFilter, Prisma.personWhereInput>
-}, "personId" | "nickName" | "password">
+}, "personId" | "nickName">
 
 export type workerOrderByWithAggregationInput = {
   personId?: Prisma.SortOrder
