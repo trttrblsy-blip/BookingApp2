@@ -38,7 +38,7 @@ model room {
   type     room_type
   booking  booking[]
 }
-enum room_type{
+enum room_type {
  SINGLE
  TRIPLE
  CONNECTING

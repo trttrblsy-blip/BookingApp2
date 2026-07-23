@@ -1,20 +1,18 @@
 import { Form, useActionData, useNavigate, type ActionFunctionArgs } from "react-router";
 import TypesDropdown from "~/components/typesDropdown";
-import type * as $Enums from "../../generated/prisma/enums";
 import { AlertDemo } from "~/components/alerDemo";
 import { room_type } from "../../generated/prisma/enums";
-import { prisma } from "~/services/prisma.server";
 import { format } from "date-fns";
 import type { person } from "../../generated/prisma/client";
+import { createRoom } from "~/services/room.server";
+import { createWorker } from "~/services/worker.server";
 export async function action({ request }: ActionFunctionArgs) {
   try {
     const dataForm = await request.formData();
     if (dataForm.get("capacity")) {
       const capacity: number = Number.parseInt(dataForm.get("capacity") as string);
-      const type: room_type = room_type[dataForm.get("roomType") as keyof typeof room_type];
-      await prisma.room.create({
-        data: { capacity, type },
-      });
+      const type: room_type = dataForm.get("roomType") as room_type;
+      await createRoom(capacity, type);
       return { secsses: true, action: "room", message: "good job!" };
     } else if (dataForm.get("workerName")) {
       const workerName: string = dataForm.get("workerName") as string;
@@ -27,15 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
       const nickName: string = workerName.split(" ")[0] + "123";
       const password: string = format(workerBirthday, "yyyy-MM-dd") + workerName.split(" ")[0].slice(0, 3);
       const worker: person = { id: workerId, birthDay: workerBirthday, fullName: workerName };
-
-      await prisma.worker.create({
-        data: {
-          person: { create: { ...worker } },
-          nickName,
-          password,
-        },
-      });
-
+      createWorker(worker, nickName, password);
       return { secsses: true, action: "worker", message: "nickname: " + nickName + "\n password: " + password };
     }
   } catch (error) {

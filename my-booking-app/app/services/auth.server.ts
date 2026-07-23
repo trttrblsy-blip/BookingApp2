@@ -16,3 +16,5 @@ export async function getCurrentWorker(request: Request) {
   })) as Worker;
   return worker;
 }
+
+
