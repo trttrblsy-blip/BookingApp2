@@ -9,7 +9,7 @@ const auth = async (nickName: string, password: string) => {
 };
 
 const createWorker = async (worker: person, nickName: string, password: string) => {
-  await prisma.worker.create({
+   return await prisma.worker.create({
     data: {
       person: { create: { ...worker } },
       nickName,

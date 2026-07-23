@@ -1,7 +1,7 @@
 import { room_type } from "../../generated/prisma/enums";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
 
-export default function TypesDropdown() {
+export default function TypesDropdown({ value }: { value: room_type | undefined }) {
   return (
     <Select items={room_type} name="roomType">
       <SelectTrigger className="w-full max-w-48">
@@ -12,7 +12,7 @@ export default function TypesDropdown() {
           <SelectLabel>Type</SelectLabel>
           {Object.values(room_type).map((item) => (
             <SelectItem key={item} value={item}>
-              {item}
+              {item.toLowerCase()}
             </SelectItem>
           ))}
         </SelectGroup>

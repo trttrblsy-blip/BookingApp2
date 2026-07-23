@@ -4,6 +4,7 @@ import { Form, useActionData, useFetcher } from "react-router";
 import { format } from "date-fns";
 import type { action } from "~/routes/actions/addBooking";
 import { AlertDemo } from "./alerDemo";
+import { useState } from "react";
 
 const customStyles = {
   content: {
@@ -17,10 +18,18 @@ const customStyles = {
 };
 
 const NewBooking = ({ bookingDTO, isOpen }: { bookingDTO: BookingDTO; isOpen: boolean }) => {
+  const actionData = useActionData<typeof action>();
+  const [isModalOpen, setIsModalOpen] = useState(isOpen);
   return (
     <div>
-      <Modal isOpen={isOpen} style={customStyles} contentLabel="Example Modal">
-        <Form method="post" action="/actions/addBooking">
+      <Modal isOpen={isModalOpen} style={customStyles} contentLabel="Example Modal">
+        <Form
+          method="post"
+          action="/Booking"
+          onSubmit={() => {
+            setIsModalOpen(false);
+          }}
+        >
           <label className="block text-gray-700">Booking to room number</label>
           <input
             className="border border-gray-300 rounded px-3 py-2 w-full"

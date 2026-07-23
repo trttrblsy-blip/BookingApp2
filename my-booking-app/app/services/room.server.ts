@@ -37,7 +37,7 @@ const findFreeRooms = async ({
 const createRoom = async (capacity: number, type: room_type) => {
   const enumKey = Object.entries(room_type).find(([, v]) => v === type)?.[0];
   const dbType = enumKey ?? (type as any);
-  await prisma.room.create({
+  return await prisma.room.create({
     data: { capacity, type: dbType },
   });
 };

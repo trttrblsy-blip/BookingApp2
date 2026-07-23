@@ -10,6 +10,7 @@ const createbooking = async (roomId: number, startDate: Date, endDate: Date, cus
       endDate: endDate,
       person: { connectOrCreate: { create: { ...custumer }, where: { id: custumer.id } } },
       worker: { connect: { personId: worker.personId } },
+      
     },
   });
 };

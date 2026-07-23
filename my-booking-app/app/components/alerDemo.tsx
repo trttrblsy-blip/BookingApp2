@@ -39,7 +39,6 @@ export function AlertDemo({
           <AlertDialogAction
             onClick={() => {
               setOpen(false);
-              window.location.reload();
             }}
           >
             Close

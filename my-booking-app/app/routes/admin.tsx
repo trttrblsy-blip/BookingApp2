@@ -6,14 +6,16 @@ import { format } from "date-fns";
 import type { person } from "../../generated/prisma/client";
 import { createRoom } from "~/services/room.server";
 import { createWorker } from "~/services/worker.server";
+import type Room from "~/utils/Room";
+import type { Worker } from "~/utils/Worker";
 export async function action({ request }: ActionFunctionArgs) {
   try {
     const dataForm = await request.formData();
     if (dataForm.get("capacity")) {
       const capacity: number = Number.parseInt(dataForm.get("capacity") as string);
       const type: room_type = dataForm.get("roomType") as room_type;
-      await createRoom(capacity, type);
-      return { secsses: true, action: "room", message: "good job!" };
+      const room: Room = await createRoom(capacity, type);
+      return { secsses: true, action: "room", message: "good job!", key: room.id };
     } else if (dataForm.get("workerName")) {
       const workerName: string = dataForm.get("workerName") as string;
       const workerId: number = Number.parseInt(dataForm.get("workerId") as string);
@@ -24,13 +26,18 @@ export async function action({ request }: ActionFunctionArgs) {
       }
       const nickName: string = workerName.split(" ")[0] + Math.floor(Math.random() * 899 + 100);
       const password: string = format(workerBirthday, "yyyy-MM-dd") + workerName.split(" ")[0].slice(0, 3);
-      const worker: person = { id: workerId, birthDay: workerBirthday, fullName: workerName };
-      await createWorker(worker, nickName, password);
-      return { secsses: true, action: "worker", message: "nickname: " + nickName + "\n password: " + password };
+      const person: person = { id: workerId, birthDay: workerBirthday, fullName: workerName };
+      const worker: Worker = await createWorker(person, nickName, password);
+      return {
+        secsses: true,
+        action: "worker",
+        message: "nickname: " + nickName + "\n password: " + password,
+        key: worker.personId,
+      };
     }
   } catch (error) {
     if (error instanceof Error) {
-      return { secsses: false, error: error.message };
+      return { secsses: false, error: error.message, key: Math.random() };
     }
   }
 }
@@ -41,10 +48,11 @@ const Admin = () => {
   return (
     <div>
       {actionData?.secsses == false && (
-        <AlertDemo description={actionData!.error!} iserror={true} isOpen={true}></AlertDemo>
+        <AlertDemo key={actionData.key} description={actionData!.error!} iserror={true} isOpen={true}></AlertDemo>
       )}
       {actionData?.secsses == true && (
         <AlertDemo
+          key={actionData.key}
           title={actionData.action + " added secssfully!"}
           description={actionData?.message!}
           iserror={false}
