@@ -11,8 +11,8 @@ export async function action({ request }: ActionFunctionArgs) {
     const dataForm = await request.formData();
     if (dataForm.get("capacity")) {
       const capacity: number = Number.parseInt(dataForm.get("capacity") as string);
-      const type: room_type = room_type[dataForm.get("roomType") as keyof typeof room_type];
-      createRoom(capacity, type);
+      const type: room_type = dataForm.get("roomType") as room_type;
+      await createRoom(capacity, type);
       return { secsses: true, action: "room", message: "good job!" };
     } else if (dataForm.get("workerName")) {
       const workerName: string = dataForm.get("workerName") as string;

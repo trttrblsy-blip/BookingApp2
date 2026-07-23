@@ -5,26 +5,20 @@ import { room_type, worker_role } from "../../generated/prisma/enums";
 import NewBooking from "~/components/newBooking";
 import { useState } from "react";
 import type { BookingDTO } from "~/utils/BookingDTO";
-import type { Worker } from "~/utils/Worker";
-import * as z from "zod";
 import { getCurrentWorker } from "~/services/auth.server";
 import TypesDropdown from "~/components/typesDropdown";
 import { AlertDemo } from "~/components/alerDemo";
 import { findFreeRooms } from "~/services/room.server";
 import type { action } from "./actions/addBooking";
+import { roomDTO } from "~/schema/schema.roomDTO";
+import { Separator } from "@base-ui/react";
 export function meta({}: Route.MetaArgs) {
   return [{ title: "BookingApp" }, { name: "description", content: "Welcome to BookingApp!" }];
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const worker = await getCurrentWorker(request);
   try {
-    const roomDTO = z.object({
-      startDate: z.date(),
-      endDate: z.date(),
-      amount: z.number(),
-      type: z.nativeEnum(room_type),
-    });
-    const worker = await getCurrentWorker(request);
     const url = new URL(request.url);
     if (!url.searchParams.get("startDate")) {
       return {
@@ -40,15 +34,16 @@ export async function loader({ request }: Route.LoaderArgs) {
     }
     const amount = Number(url.searchParams.get("amount"));
     const type: string = url.searchParams.get("roomType") as string;
-    const parsed =await roomDTO.safeParseAsync({ startDate, endDate, amount, "type": "triple"})
-
-    console.log(parsed)
-
-    const rooms = await findFreeRooms(await roomDTO.parseAsync({ startDate, endDate, amount, type }));
+    const parsed = await roomDTO.safeParseAsync({ startDate, endDate, amount, type });
+    if (!parsed.success) {
+      throw Error("Invalid room search parameters");
+    }
+    const rooms = await findFreeRooms(parsed.data);
     return { rooms, startDate, endDate, amount, isSearched: true, worker };
   } catch (error) {
     if (error instanceof Error) {
-      return { error: error.message };
+      console.log(error.message);
+      return { error: error.message, worker };
     }
   }
 }
@@ -95,17 +90,20 @@ const Booking = () => {
             search rooms
           </button>
         </Form>
-        <ul className="space-y-4 py-4">
+        <div className="space-y-4 py-4">
           {loaderData?.isSearched &&
             loaderData.rooms.map((room) => (
-              <li className=" bg-white rounded shadow " key={room.id.toString()}>
-                <button className=" text-teal-600 " onClick={openModal} id={room.id.toString()}>
-                  <span className="font-semibold text-xl">{room.id}</span>
-                  <p className="text-gray-700">{room_type[room.type as keyof typeof room_type]}</p>
-                </button>
-              </li>
+              <div>
+                <dl className=" bg-white rounded shadow " key={room.id.toString()}>
+                  <button className=" text-teal-600 " onClick={openModal} id={room.id.toString()}>
+                    <dt className="font-semibold text-xl">{room.id}</dt>
+                    <dd className="text-gray-700">{room.type.toLowerCase()}</dd>
+                  </button>
+                </dl>
+                <Separator />
+              </div>
             ))}
-        </ul>
+        </div>
       </div>
       {worker?.role == worker_role.ADMIN && (
         <button
