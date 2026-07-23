@@ -42,7 +42,6 @@ export async function loader({ request }: Route.LoaderArgs) {
     return { rooms, startDate, endDate, amount, isSearched: true, worker };
   } catch (error) {
     if (error instanceof Error) {
-      console.log(error.message);
       return { error: error.message, worker };
     }
   }

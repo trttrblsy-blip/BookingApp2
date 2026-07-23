@@ -25,7 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
       const nickName: string = workerName.split(" ")[0] + "123";
       const password: string = format(workerBirthday, "yyyy-MM-dd") + workerName.split(" ")[0].slice(0, 3);
       const worker: person = { id: workerId, birthDay: workerBirthday, fullName: workerName };
-      createWorker(worker, nickName, password);
+      await createWorker(worker, nickName, password);
       return { secsses: true, action: "worker", message: "nickname: " + nickName + "\n password: " + password };
     }
   } catch (error) {
